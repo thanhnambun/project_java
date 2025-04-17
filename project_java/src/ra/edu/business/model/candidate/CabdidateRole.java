@@ -1,5 +1,5 @@
 package ra.edu.business.model.candidate;
 
 public enum CabdidateRole {
-    admin,candidate
+    admin, cadidate
 }

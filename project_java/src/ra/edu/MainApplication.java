@@ -56,7 +56,7 @@ public class MainApplication {
 
             switch (choice) {
                 case 1:
-                    login(sc, candidateService, loginService);
+                    login(sc, loginService);
                     break;
                 case 2:
                     register(sc, candidateService, registerService);
@@ -71,9 +71,11 @@ public class MainApplication {
         }
     }
 
-    private static void login(Scanner sc, CandidateService candidateService, LoginService loginService) throws IOException {
-        String email = CandidateValidator.validateEmail(sc, "Vui lòng nhập email: ", candidateService);
+    private static void login(Scanner sc,  LoginService loginService) throws IOException {
+        String email = CandidateValidator.inputEmail(sc, "Vui lòng nhập email: ");
         String password = Validator.validateString(sc, "Vui lòng nhập mật khẩu: ", new StringRule(100, 0));
+        System.out.println(email);
+        System.out.println(password);
         Candidate candidate = loginService.login(email, password);
 
         if (candidate == null) {

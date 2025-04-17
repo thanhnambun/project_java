@@ -24,4 +24,19 @@ public class CandidateValidator {
 
         }
     }
+    public static String inputEmail(Scanner scanner, String message) {
+        System.out.println(message);
+        while (true) {
+            String value = scanner.nextLine().trim();
+            if (value.isEmpty()) {
+                System.err.println("Bạn chưa nhập email sinh viên, vui lòng nhập lại");
+                continue;
+            }
+            if (Validator.isValidEmail(value)) {
+                    return value;
+
+            }
+            System.err.println("Không đúng định dạng email, vui lòng nhập lại");
+        }
+    }
 }

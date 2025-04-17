@@ -4,6 +4,7 @@ public class StringRule {
     private int min;
     private int max;
 
+
     public StringRule() {
     }
 

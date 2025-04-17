@@ -21,7 +21,7 @@ public class LoginDaoImp implements LoginDao {
             callStmt.setString(1, email);
             callStmt.setString(2, password);
             callStmt.execute();
-            ResultSet rs = callStmt.getResultSet();
+            ResultSet rs = callStmt.executeQuery();
             if (rs.next()){
                 Candidate can = new Candidate();
                 can.setName(rs.getString("name"));
@@ -30,7 +30,7 @@ public class LoginDaoImp implements LoginDao {
                 can.setPhone(rs.getString("phone"));
                 can.setDescription(rs.getString("description"));
                 can.setExperience(rs.getInt("experience"));
-                can.setDod(rs.getDate("dod"));
+                can.setDod(rs.getDate("dob"));
                 can.setStatus(CabdidateStatus.valueOf(rs.getString("status")));
                 can.setGender(CandidateGender.valueOf(rs.getString("gender")));
                 can.setRole(CabdidateRole.valueOf(rs.getString("role")));

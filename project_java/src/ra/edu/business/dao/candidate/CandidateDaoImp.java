@@ -202,7 +202,7 @@ public class CandidateDaoImp implements CadidateDao {
         CallableStatement cs = null;
         try {
             conn = ConnectionDB.openConnection();
-            cs = conn.prepareCall("{CALL check_isExit_name_candidate(?)}");
+            cs = conn.prepareCall("{CALL check_isExit_email_candidate(?)}");
             cs.setString(1, email);
             ResultSet rs = cs.executeQuery();
             if (rs.next()) {

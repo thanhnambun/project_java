@@ -156,4 +156,20 @@ public class Candidate implements Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Candidate{" +
+                "id=" + id +
+                ", Name='" + Name + '\'' +
+                ", Email='" + Email + '\'' +
+                ", Password='" + Password + '\'' +
+                ", Phone='" + Phone + '\'' +
+                ", Gender=" + Gender +
+                ", Dod=" + Dod +
+                ", description='" + description + '\'' +
+                ", experience=" + experience +
+                ", status=" + status +
+                ", role=" + role +
+                '}';
+    }
 }
