@@ -1,6 +1,7 @@
 package ra.edu.presntation;
 
 import ra.edu.MainApplication;
+import ra.edu.presntation.candidateAdmin.CandidateAdminUI;
 
 import java.util.Scanner;
 
@@ -18,12 +19,16 @@ public class AdminMain {
             String choice = sc.nextLine();
             switch (choice) {
                 case "1":
+                    TechnologyUI.Menu(sc);
                     break;
                 case "2":
+                    CandidateAdminUI.Menu(sc);
                     break;
                 case "3":
+                    RecruitmentPositionUI.Menu(sc);
                     break;
                 case "4":
+                    ApplicationAdminUI.Menu(sc);
                     break;
                 case "5":
                     MainApplication.logout();

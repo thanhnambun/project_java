@@ -11,87 +11,79 @@ import java.util.Scanner;
 
 public class Candidate implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static int idSequace =0;
+
     private int id;
-    private String Name;
-    private String Email;
-    private String Password;
-    private String Phone;
-    private CandidateGender Gender;
-    private Date Dod;
+    private String name;
+    private String email;
+    private String phone;
+    private CandidateGender gender;
+    private Date dob;
     private String description;
     private int experience;
-    private CabdidateStatus status;
-    private CabdidateRole role;
+    private CandidateStatus status;
 
     public Candidate() {
-        this.id = ++ idSequace ;
     }
 
-    public Candidate(String name, String email, String password, String phone, CandidateGender gender, Date dod, String description, int experience, CabdidateStatus status, CabdidateRole role) {
-        this.id = ++ idSequace ;
-        Name = name;
-        Email = email;
-        Password = password;
-        Phone = phone;
-        Gender = gender;
-        Dod = dod;
+    public Candidate(String name, String email, String phone, CandidateGender gender, Date dob,
+                     String description, int experience, CandidateStatus status) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.gender = gender;
+        this.dob = dob;
         this.description = description;
         this.experience = experience;
         this.status = status;
-        this.role = role;
     }
 
+    // Getters và Setters (chỉnh tên chuẩn camelCase)
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
-    }
-
-    public String getPassword() {
-        return Password;
-    }
-
-    public void setPassword(String password) {
-        Password = password;
+        this.email = email;
     }
 
     public String getPhone() {
-        return Phone;
+        return phone;
     }
 
     public void setPhone(String phone) {
-        Phone = phone;
+        this.phone = phone;
     }
 
     public CandidateGender getGender() {
-        return Gender;
+        return gender;
     }
 
     public void setGender(CandidateGender gender) {
-        Gender = gender;
+        this.gender = gender;
     }
 
-    public Date getDod() {
-        return Dod;
+    public Date getDob() {
+        return dob;
     }
 
-    public void setDod(Date dod) {
-        Dod = dod;
+    public void setDob(Date dob) {
+        this.dob = dob;
     }
 
     public String getDescription() {
@@ -110,35 +102,23 @@ public class Candidate implements Serializable {
         this.experience = experience;
     }
 
-    public CabdidateStatus getStatus() {
+    public CandidateStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CabdidateStatus status) {
+    public void setStatus(CandidateStatus status) {
         this.status = status;
     }
 
-    public CabdidateRole getRole() {
-        return role;
-    }
-
-    public void setRole(CabdidateRole role) {
-        this.role = role;
-    }
-
     public void inputData(Scanner sc, CandidateService candidateService) {
-        this.id = ++ idSequace ;
-        Name = Validator.validateString(sc, "Vui lòng nhập tên ứng viên: ", new StringRule(100, 0));
-        Email = CandidateValidator.validateEmail(sc, "Vui lòng nhập email của ứng viên: ", candidateService);
-        Password = Validator.validateString(sc, "Vui lòng nhập mật khẩu: ", new StringRule(100, 0));
-        Phone = inputPhone(sc,"vui lòng nhập số điện thaoij");
-        Gender = Validator.validateStatus(sc, "Vui lòng nhập giới tính (male/female/other): ", CandidateGender.class);
-        this.status = Validator.validateStatus(sc, "Nhập trạng thái tài khoản (active/inactive): ", CabdidateStatus.class);
-        this.description = Validator.validateString(sc, "Nhập mô tả bản thân (có thể để trống): ", new StringRule(100, 0));
-        this.experience = Validator.validateInt(sc);
-        Dod = Date.valueOf(Validator.validateDate("Vui lòng nhập ngày sinh (dd/MM/yyyy): ", sc));
-        this.role = Validator.validateStatus(sc, "Nhập vai trò (Admin/cadidate): ", CabdidateRole.class);
-
+        name = Validator.validateString(sc, "Nhập tên ứng viên: ", new StringRule(100, 0));
+        email = CandidateValidator.validateEmail(sc, "Nhập email ứng viên: ", candidateService);
+        phone = inputPhone(sc, "Nhập số điện thoại:");
+        gender = Validator.validateStatus(sc, "Nhập giới tính (male/female/other): ", CandidateGender.class);
+        status = Validator.validateStatus(sc, "Nhập trạng thái tài khoản (active/inactive): ", CandidateStatus.class);
+        description = Validator.validateString(sc, "Nhập mô tả bản thân: ", new StringRule(100, 0));
+        experience = Validator.validateInt(sc,"vui lòng nhập số năm kinh nghiệm");
+        dob = Date.valueOf(Validator.validateDate("Nhập ngày sinh (yyyy-MM-dd): ", sc));
     }
 
     public String inputPhone(Scanner scanner, String message) {
@@ -146,13 +126,13 @@ public class Candidate implements Serializable {
         while (true) {
             String value = scanner.nextLine().trim();
             if (value.isEmpty()) {
-                System.err.println("Bạn chưa nhập số điện thoại của sinh viên, vui lòng nhập lại");
+                System.err.println("Bạn chưa nhập số điện thoại, vui lòng nhập lại");
                 continue;
             }
             if (Validator.isValidPhoneNumberVN(value)) {
                 return value;
             }
-            System.err.println("Không đúng số điện thoại di đông VN, vui lòng nhập lại");
+            System.err.println("Số điện thoại không hợp lệ, vui lòng nhập lại");
         }
     }
 
@@ -160,16 +140,14 @@ public class Candidate implements Serializable {
     public String toString() {
         return "Candidate{" +
                 "id=" + id +
-                ", Name='" + Name + '\'' +
-                ", Email='" + Email + '\'' +
-                ", Password='" + Password + '\'' +
-                ", Phone='" + Phone + '\'' +
-                ", Gender=" + Gender +
-                ", Dod=" + Dod +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender=" + gender +
+                ", dob=" + dob +
                 ", description='" + description + '\'' +
                 ", experience=" + experience +
                 ", status=" + status +
-                ", role=" + role +
                 '}';
     }
 }

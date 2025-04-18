@@ -1,4 +1,4 @@
-package ra.edu.business.service.candidate;
+package ra.edu.business.dao.candidate;
 
 import ra.edu.business.model.account.Account;
 import ra.edu.business.model.candidate.Candidate;
@@ -6,7 +6,7 @@ import ra.edu.business.model.candidate.CandidateStatus;
 
 import java.util.List;
 
-public interface CandidateService {
+public interface CandidateDao {
     Candidate findById(int id);
     List<Candidate> findAll(int page);
     List<Candidate> searchByName(String keyword);
@@ -14,10 +14,10 @@ public interface CandidateService {
     List<Candidate> filterByAge(int minAge, int maxAge);
     List<Candidate> filterByGender(String gender);
     List<Candidate> filterByTechnology(int techId);
-    boolean updateProfile( Candidate candidate);
+    boolean updateProfile(Candidate candidate);
 
     boolean changePassword(Account account);
-    //    List<Application> findApplicationsByCandidate(int candidateId);
+//    List<Application> findApplicationsByCandidate(int candidateId);
     int getTotalPages();
     boolean isEmailExist(String email);
 }

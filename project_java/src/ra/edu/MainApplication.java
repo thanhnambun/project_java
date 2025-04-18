@@ -1,6 +1,7 @@
 package ra.edu;
 
-import ra.edu.business.model.candidate.CabdidateRole;
+import ra.edu.business.model.account.Account;
+import ra.edu.business.model.account.AccountRole;
 import ra.edu.business.model.candidate.Candidate;
 import ra.edu.business.service.candidate.CandidateService;
 import ra.edu.business.service.candidate.CandidateServiceImp;
@@ -27,11 +28,11 @@ public class MainApplication {
         LoginService loginService = new LoginServiceImp();
         RegisterService registerService = new RegisterServiceImp();
 
-        Candidate loggedInUser = readLoggedInCandidate();
+        Account loggedInUser = readLoggedInCandidate();
         if (loggedInUser != null) {
-            System.out.println("\nTự động đăng nhập với tài khoản: " + loggedInUser.getEmail());
+            System.out.println("\nTự động đăng nhập với tài khoản: " + loggedInUser.getUsername());
             TimeUnit.SECONDS.sleep(randomDelay());
-            if (loggedInUser.getRole() == CabdidateRole.admin) {
+            if (loggedInUser.getRole() == AccountRole.admin) {
                 AdminMain.Menu(sc);
             } else {
                 CandidateUI.Menu(sc);
@@ -76,16 +77,16 @@ public class MainApplication {
         String password = Validator.validateString(sc, "Vui lòng nhập mật khẩu: ", new StringRule(100, 0));
         System.out.println(email);
         System.out.println(password);
-        Candidate candidate = loginService.login(email, password);
+        Account account = loginService.login(email, password);
 
-        if (candidate == null) {
+        if (account == null) {
             System.out.println("Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại.");
             return;
         }
 
-        saveLoggedInCandidate(candidate);
+        saveLoggedInCandidate(account);
 
-        if (candidate.getRole() == CabdidateRole.admin) {
+        if (account.getRole() == AccountRole.admin) {
             AdminMain.Menu(sc);
         } else {
             CandidateUI.Menu(sc);
@@ -93,11 +94,13 @@ public class MainApplication {
     }
 
     private static void register(Scanner sc, CandidateService candidateService, RegisterService registerService) throws IOException {
+        Account account = new Account();
         Candidate candidate = new Candidate();
         candidate.inputData(sc, candidateService);
-        if (registerService.register(candidate)) {
-            saveLoggedInCandidate(candidate);
-            if (candidate.getRole() == CabdidateRole.admin) {
+
+        if (registerService.register(candidate,account)) {
+            saveLoggedInCandidate(account);
+            if (account.getRole() == AccountRole.admin) {
                 AdminMain.Menu(sc);
             } else {
                 CandidateUI.Menu(sc);
@@ -107,17 +110,17 @@ public class MainApplication {
         }
     }
 
-    static void saveLoggedInCandidate(Candidate candidate) {
+    static void saveLoggedInCandidate(Account Account) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TOKEN_FILE))) {
-            oos.writeObject(candidate);
+            oos.writeObject(Account);
         } catch (IOException e) {
             System.out.println("Không thể lưu thông tin đăng nhập.");
         }
     }
 
-    static Candidate readLoggedInCandidate() {
+    static Account readLoggedInCandidate() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TOKEN_FILE))) {
-            return (Candidate) ois.readObject();
+            return (Account) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             return null;
         }

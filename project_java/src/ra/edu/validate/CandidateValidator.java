@@ -14,7 +14,7 @@ public class CandidateValidator {
                 continue;
             }
             if (Validator.isValidEmail(value)) {
-                if (candidateService.isEmailExists(value)) {
+                if (candidateService.isEmailExist(value)) {
                     return value;
                 }else {
                     System.err.println("tên email đã bị trùng vui lòng nhập lại");

@@ -1,7 +1,8 @@
 package ra.edu.business.service.login;
 
-import ra.edu.business.model.candidate.Candidate;
+import ra.edu.business.model.account.Account;
+
 
 public interface LoginService {
-    Candidate login(String email, String password );
+    Account login(String email, String password );
 }

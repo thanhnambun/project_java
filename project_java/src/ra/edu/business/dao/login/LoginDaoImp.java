@@ -1,10 +1,8 @@
 package ra.edu.business.dao.login;
 
 import ra.edu.business.config.ConnectionDB;
-import ra.edu.business.model.candidate.CabdidateRole;
-import ra.edu.business.model.candidate.CabdidateStatus;
-import ra.edu.business.model.candidate.Candidate;
-import ra.edu.business.model.candidate.CandidateGender;
+import ra.edu.business.model.account.Account;
+import ra.edu.business.model.account.AccountRole;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -12,35 +10,35 @@ import java.sql.ResultSet;
 
 public class LoginDaoImp implements LoginDao {
     @Override
-    public Candidate login(String email,String password ) {
-        Connection connectionDB = null;
+    public Account login(String username, String password) {
+        Connection connection = null;
         CallableStatement callStmt = null;
+        ResultSet rs = null;
+
         try {
-            connectionDB = ConnectionDB.openConnection();
-            callStmt = connectionDB.prepareCall("{call check_account(?,?)}");
-            callStmt.setString(1, email);
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call check_account(?, ?)}");
+            callStmt.setString(1, username);
             callStmt.setString(2, password);
-            callStmt.execute();
-            ResultSet rs = callStmt.executeQuery();
-            if (rs.next()){
-                Candidate can = new Candidate();
-                can.setName(rs.getString("name"));
-                can.setEmail(rs.getString("email"));
-                can.setPassword(rs.getString("password"));
-                can.setPhone(rs.getString("phone"));
-                can.setDescription(rs.getString("description"));
-                can.setExperience(rs.getInt("experience"));
-                can.setDod(rs.getDate("dob"));
-                can.setStatus(CabdidateStatus.valueOf(rs.getString("status")));
-                can.setGender(CandidateGender.valueOf(rs.getString("gender")));
-                can.setRole(CabdidateRole.valueOf(rs.getString("role")));
-                return can;
+            rs = callStmt.executeQuery();
+
+            if (rs.next()) {
+                Account account = new Account();
+                account.setId(rs.getInt("id"));
+                account.setUsername(rs.getString("username"));
+                account.setPassword(rs.getString("password"));
+                account.setCandidateId(rs.getInt("candidate_id"));
+                account.setRole(AccountRole.valueOf(rs.getString("role")));
+                return account;
             }
-        }catch (Exception e){
-            e.fillInStackTrace();
-        }finally {
-            ConnectionDB.closeConnection(connectionDB,callStmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
+
         return null;
     }
+
 }

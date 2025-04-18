@@ -22,9 +22,9 @@ public class Validator {
         return value != null && Pattern.matches(phoneRegex, value.trim());
     }
 
-    public static int validateInt(Scanner sc) {
+    public static int validateInt(Scanner sc,String message) {
         while (true) {
-            System.out.println("vui lòng nhập vào 1 số nguyên");
+            System.out.println(message);
             try {
                 int number = Integer.parseInt(sc.nextLine());return number;
             } catch (Exception e) {
