@@ -2,6 +2,7 @@ package ra.edu.business.dao.candidate;
 
 import ra.edu.business.config.ConnectionDB;
 import ra.edu.business.model.account.Account;
+import ra.edu.business.model.account.AccountRole;
 import ra.edu.business.model.candidate.Candidate;
 import ra.edu.business.model.candidate.CandidateGender;
 import ra.edu.business.model.candidate.CandidateStatus;
@@ -47,7 +48,7 @@ public class CandidateDaoImp implements CandidateDao {
     }
 
     @Override
-    public List<Candidate> findAll(int page) {
+    public List<Candidate> findAll(int page,int pageSize) {
         List<Candidate> candidates = new ArrayList<>();
         Connection connection = null;
         CallableStatement callStmt = null;
@@ -57,6 +58,7 @@ public class CandidateDaoImp implements CandidateDao {
             connection = ConnectionDB.openConnection();
             callStmt = connection.prepareCall("{call find_all_candidate(?)}");
             callStmt.setInt(1, page);
+            callStmt.setInt(2, pageSize);
             rs = callStmt.executeQuery();
 
             while (rs.next()) {
@@ -300,7 +302,7 @@ public class CandidateDaoImp implements CandidateDao {
     public int getTotalPages() {
         int totalPages = 0;
 
-        String sql = "{call get_total_pages_candidate()}";
+        String sql = "{call get_total_candidate_pages()}";
 
         try (
                 Connection connection = ConnectionDB.openConnection();
@@ -326,8 +328,34 @@ public class CandidateDaoImp implements CandidateDao {
 
         try {
             connection = ConnectionDB.openConnection();
-            callStmt = connection.prepareCall("{call check_email_exists(?)}");
+            callStmt = connection.prepareCall("{call check_isExit_email_candidate(?)}");
             callStmt.setString(1, email);
+            rs = callStmt.executeQuery();
+
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
+        }
+
+        return exists;
+    }
+
+    @Override
+    public boolean isPhoneExist(String phone) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        ResultSet rs = null;
+        boolean exists = false;
+
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call is_exit_phone(?)}");
+            callStmt.setString(1, phone);
             rs = callStmt.executeQuery();
 
             if (rs.next()) {
@@ -362,4 +390,50 @@ public class CandidateDaoImp implements CandidateDao {
         }
     }
 
+    @Override
+    public boolean changePasswordUser(int id,String password,String newPassword) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call change_password_user(?, ?, ?)}");
+            callStmt.setInt(1, id);
+            callStmt.setString(2, newPassword);
+            callStmt.setString(3, password);
+            int result = callStmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
+        }
+    }
+
+    @Override
+    public Account findAccountById(int id) {
+
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call find_account_by_id_candidate( ?)}");
+            callStmt.setInt(1, id);
+            ResultSet rs = callStmt.executeQuery();
+            if (rs.next()) {
+                Account account = new Account();
+                account.setId(rs.getInt("id"));
+                account.setUsername(rs.getString("username"));
+                account.setPassword(rs.getString("password"));
+                account.setCandidateId(rs.getInt("candidate_id"));
+                account.setRole(AccountRole.valueOf(rs.getString("role")));
+                return account;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
+        }
+        return null;
+    }
 }

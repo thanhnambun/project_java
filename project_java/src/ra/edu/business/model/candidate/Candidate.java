@@ -1,5 +1,6 @@
 package ra.edu.business.model.candidate;
 
+import ra.edu.business.model.Status;
 import ra.edu.business.service.candidate.CandidateService;
 import ra.edu.validate.CandidateValidator;
 import ra.edu.validate.StringRule;
@@ -113,9 +114,9 @@ public class Candidate implements Serializable {
     public void inputData(Scanner sc, CandidateService candidateService) {
         name = Validator.validateString(sc, "Nhập tên ứng viên: ", new StringRule(100, 0));
         email = CandidateValidator.validateEmail(sc, "Nhập email ứng viên: ", candidateService);
-        phone = inputPhone(sc, "Nhập số điện thoại:");
+        phone = CandidateValidator.validatePhone(sc,"vui lòng nhập số điện thoại",candidateService);
         gender = Validator.validateStatus(sc, "Nhập giới tính (male/female/other): ", CandidateGender.class);
-        status = Validator.validateStatus(sc, "Nhập trạng thái tài khoản (active/inactive): ", CandidateStatus.class);
+        status = CandidateStatus.active;
         description = Validator.validateString(sc, "Nhập mô tả bản thân: ", new StringRule(100, 0));
         experience = Validator.validateInt(sc,"vui lòng nhập số năm kinh nghiệm");
         dob = Date.valueOf(Validator.validateDate("Nhập ngày sinh (yyyy-MM-dd): ", sc));

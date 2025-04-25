@@ -22,13 +22,8 @@ public class CandidateServiceImp implements CandidateService {
     }
 
     @Override
-    public List<Candidate> findAll(int page) {
-        return cadidateDao.findAll(page);
-    }
-
-    @Override
-    public boolean resetPasswordAdmin(int id) {
-        return cadidateDao.resetPasswordAdmin(id);
+    public List<Candidate> findAll(int page,int pageSize) {
+        return cadidateDao.findAll(page,pageSize);
     }
 
     @Override
@@ -62,8 +57,18 @@ public class CandidateServiceImp implements CandidateService {
     }
 
     @Override
+    public Account findAccountById(int id) {
+        return cadidateDao.findAccountById(id);
+    }
+
+    @Override
     public boolean changePassword(Account account) {
         return cadidateDao.changePassword(account);
+    }
+
+    @Override
+    public boolean changePasswordUser(int id, String password, String newPassword) {
+        return cadidateDao.changePasswordUser(id, password, newPassword);
     }
 
     @Override
@@ -74,5 +79,10 @@ public class CandidateServiceImp implements CandidateService {
     @Override
     public boolean isEmailExist(String email) {
         return cadidateDao.isEmailExist(email);
+    }
+
+    @Override
+    public boolean isPhoneExist(String phone) {
+        return cadidateDao.isPhoneExist(phone);
     }
 }

@@ -9,7 +9,8 @@ public interface TechnologyDao {
     boolean saveTechnology( Technology technology);
     boolean deleteTechnology(Technology technology);
     boolean updateTechnology(Technology technology);
-    List<Technology> findAll(int page);
+    List<Technology> findAll(int page,int pageSize);
     Technology findTechnologyById(int id);
-    Technology findTechnologyByName(String name);
+    List<Technology> findTechnologyByName(String name);
+    boolean isExistTechnology(String name);
 }

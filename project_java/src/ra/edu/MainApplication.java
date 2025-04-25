@@ -3,6 +3,7 @@ package ra.edu;
 import ra.edu.business.model.account.Account;
 import ra.edu.business.model.account.AccountRole;
 import ra.edu.business.model.candidate.Candidate;
+import ra.edu.business.model.candidate.CandidateStatus;
 import ra.edu.business.service.candidate.CandidateService;
 import ra.edu.business.service.candidate.CandidateServiceImp;
 import ra.edu.business.service.login.LoginService;
@@ -11,6 +12,8 @@ import ra.edu.business.service.register.RegisterService;
 import ra.edu.business.service.register.RegisterServiceImp;
 import ra.edu.presntation.AdminMain;
 import ra.edu.presntation.CandidateUI;
+import ra.edu.presntation.RecruitmentPositionUI;
+import ra.edu.validate.AccountValidator;
 import ra.edu.validate.CandidateValidator;
 import ra.edu.validate.StringRule;
 import ra.edu.validate.Validator;
@@ -31,11 +34,10 @@ public class MainApplication {
         Account loggedInUser = readLoggedInCandidate();
         if (loggedInUser != null) {
             System.out.println("\nTự động đăng nhập với tài khoản: " + loggedInUser.getUsername());
-            TimeUnit.SECONDS.sleep(randomDelay());
             if (loggedInUser.getRole() == AccountRole.admin) {
                 AdminMain.Menu(sc);
             } else {
-                CandidateUI.Menu(sc);
+                CandidateUI.menu(sc, loggedInUser.getId());
             }
         }
 
@@ -72,39 +74,53 @@ public class MainApplication {
         }
     }
 
-    private static void login(Scanner sc,  LoginService loginService) throws IOException {
+    private static void login(Scanner sc, LoginService loginService) throws IOException {
         String email = CandidateValidator.inputEmail(sc, "Vui lòng nhập email: ");
-        String password = Validator.validateString(sc, "Vui lòng nhập mật khẩu: ", new StringRule(100, 0));
-        System.out.println(email);
-        System.out.println(password);
+        String password = AccountValidator.validatePassword(sc, "Vui lòng nhập mật khẩu: ");
+
         Account account = loginService.login(email, password);
 
         if (account == null) {
-            System.out.println("Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại.");
+            System.out.println("Tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại.");
             return;
         }
 
         saveLoggedInCandidate(account);
 
         if (account.getRole() == AccountRole.admin) {
+            System.out.println("Đăng nhập thành công với vai trò Quản trị viên.");
             AdminMain.Menu(sc);
         } else {
-            CandidateUI.Menu(sc);
+            CandidateService candidateService = new CandidateServiceImp();
+            Candidate candidate = candidateService.findById(account.getId());
+
+            if (candidate == null) {
+                System.err.println("Không tìm thấy thông tin ứng viên. Vui lòng liên hệ quản trị viên.");
+                return;
+            }
+
+            if (candidate.getStatus() == CandidateStatus.block) {
+                System.err.println("Tài khoản của bạn đã bị khóa.");
+            } else {
+                System.out.println("Đăng nhập thành công. Chào mừng " + candidate.getName() + "!");
+                CandidateUI.menu(sc, account.getId());
+            }
         }
     }
+
 
     private static void register(Scanner sc, CandidateService candidateService, RegisterService registerService) throws IOException {
         Account account = new Account();
         Candidate candidate = new Candidate();
         candidate.inputData(sc, candidateService);
+        account.setUsername(candidate.getEmail());
+        account.setPassword(AccountValidator.validatePassword(sc,"vui lòng nhập mật khẩu"));
+
+        LoginService loginService = new LoginServiceImp();
 
         if (registerService.register(candidate,account)) {
-            saveLoggedInCandidate(account);
-            if (account.getRole() == AccountRole.admin) {
-                AdminMain.Menu(sc);
-            } else {
-                CandidateUI.Menu(sc);
-            }
+            System.out.println("Đã đăng kí thành công bây giờ tôi sẽ chuyển bạn sang trang đăng nhập nhá !");
+            login(sc, loginService);
         } else {
             System.out.println("Không đăng ký thành công.");
         }
@@ -124,10 +140,6 @@ public class MainApplication {
         } catch (IOException | ClassNotFoundException e) {
             return null;
         }
-    }
-
-    static int randomDelay() {
-        return new java.util.Random().nextInt(2) + 1;
     }
 
     public static void logout() {

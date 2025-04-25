@@ -4,6 +4,13 @@ public class StringRule {
     private int min;
     private int max;
 
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
 
     public StringRule() {
     }

@@ -22,23 +22,33 @@ public class Validator {
         return value != null && Pattern.matches(phoneRegex, value.trim());
     }
 
-    public static int validateInt(Scanner sc,String message) {
+    public static int validateInt(Scanner sc, String message) {
         while (true) {
             System.out.println(message);
             try {
-                int number = Integer.parseInt(sc.nextLine());return number;
-            } catch (Exception e) {
-                System.out.println("không đúng định dạng ");
+                String input = sc.nextLine().trim();
+                if (input.isEmpty()) {
+                    System.err.println("Không được để trống.");
+                    continue;
+                }
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.err.println("Không đúng định dạng số nguyên.");
             }
         }
     }
 
-    public static double validateDouble(Scanner sc) {
+
+    public static double validateDouble(Scanner sc, String message) {
         while (true) {
-            System.out.println("vui lòng nhập 1 số thực kiểu double");
+            System.out.println(message);
             try {
-                double number = Double.parseDouble(sc.nextLine());
-                return number;
+                String value = sc.nextLine().trim();
+                if (value.isEmpty()) {
+                    System.err.println("không được để trống");
+                    continue;
+                }
+                return Double.parseDouble(value);
             } catch (Exception e) {
                 System.out.println("không đúng định dạng kiểu double");
             }
@@ -69,12 +79,13 @@ public class Validator {
 
     }
 
-    public static String validateString(Scanner scanner,String message ,StringRule stringRule) {
+    public static String validateString(Scanner scanner, String message, StringRule stringRule) {
         System.out.println(message);
-        while (true){
+        while (true) {
             String value = scanner.nextLine().trim();
-            if(value.isEmpty()){
+            if (value.isEmpty()) {
                 System.err.println("không được để trống");
+                continue;
             }
             if (stringRule.isValidString(value)) {
                 return value;

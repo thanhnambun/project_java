@@ -16,16 +16,22 @@ public class TechnologyDaoImp implements TechnologyDao {
     @Override
     public int getTotalTechnologies() {
         String sql = "{call get_total_technology_page()}";
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql);
-                ResultSet rs = callStmt.executeQuery()
-        ) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+            ResultSet rs = callStmt.executeQuery();
+
             if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            System.err.println("Error getting total pages: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
         return 0;
     }
@@ -33,15 +39,21 @@ public class TechnologyDaoImp implements TechnologyDao {
     @Override
     public boolean saveTechnology(Technology technology) {
         String sql = "{call save_technology(?)}";
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setString(1, technology.getName());
             callStmt.execute();
             return true;
         } catch (SQLException e) {
-            System.err.println("Error saving technology: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
         return false;
     }
@@ -49,15 +61,21 @@ public class TechnologyDaoImp implements TechnologyDao {
     @Override
     public boolean deleteTechnology(Technology technology) {
         String sql = "{call delete_technology(?)}";
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setInt(1, technology.getId());
             callStmt.execute();
             return true;
         } catch (SQLException e) {
-            System.err.println("Error deleting technology: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
         return false;
     }
@@ -65,31 +83,40 @@ public class TechnologyDaoImp implements TechnologyDao {
     @Override
     public boolean updateTechnology(Technology technology) {
         String sql = "{call update_technology(?,?,?)}";
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setInt(1, technology.getId());
             callStmt.setString(2, technology.getName());
             callStmt.setString(3, technology.getStatus().name());
             callStmt.execute();
             return true;
         } catch (SQLException e) {
-            System.err.println("Error updating technology: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
         return false;
     }
 
     @Override
-    public List<Technology> findAll(int page) {
+    public List<Technology> findAll(int page,int pageSize) {
         List<Technology> technologies = new ArrayList<>();
-        String sql = "{call find_all_technology(?)}";
+        String sql = "{call find_all_technology(?,?)}";
+        Connection connection = null;
+        CallableStatement callStmt = null;
 
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setInt(1, page);
+            callStmt.setInt(2, pageSize);
             try (ResultSet rs = callStmt.executeQuery()) {
                 while (rs.next()) {
                     Technology technology = new Technology();
@@ -100,7 +127,11 @@ public class TechnologyDaoImp implements TechnologyDao {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving technologies: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
 
         return technologies;
@@ -109,11 +140,13 @@ public class TechnologyDaoImp implements TechnologyDao {
     @Override
     public Technology findTechnologyById(int id) {
         String sql = "{call search_technology_by_id(?)}";
+        Connection connection = null;
+        CallableStatement callStmt = null;
 
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setInt(1, id);
             ResultSet rs = callStmt.executeQuery();
 
@@ -125,33 +158,70 @@ public class TechnologyDaoImp implements TechnologyDao {
                 return technology;
             }
         } catch (SQLException e) {
-            System.err.println("Error finding technology by ID: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
 
         return null;
     }
 
     @Override
-    public Technology findTechnologyByName(String name) {
+    public List<Technology> findTechnologyByName(String name) {
         String sql = "{call search_technology_by_name(?)}";
-        try (
-                Connection connection = ConnectionDB.openConnection();
-                CallableStatement callStmt = connection.prepareCall(sql)
-        ) {
+        List<Technology> technologies = new ArrayList<>();
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall(sql);
+
             callStmt.setString(1, name);
             ResultSet rs = callStmt.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 Technology technology = new Technology();
                 technology.setId(rs.getInt("id"));
                 technology.setName(rs.getString("name"));
                 technology.setStatus(Status.valueOf(rs.getString("status")));
-                return technology;
+                technologies.add(technology);
             }
+            return technologies;
         } catch (SQLException e) {
-            System.err.println("Error finding technology by ID: " + e.getMessage());
+            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
         }
         return null;
     }
 
+    @Override
+    public boolean isExistTechnology(String name) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        ResultSet rs = null;
+        boolean exists = false;
+
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call is_exist_technology(?)}");
+            callStmt.setString(1, name);
+            rs = callStmt.executeQuery();
+
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
+        }
+
+        return exists;
+    }
 }

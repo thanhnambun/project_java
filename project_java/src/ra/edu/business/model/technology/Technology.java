@@ -47,7 +47,7 @@ public class Technology {
     }
 
     public void inputData(Scanner sc , TechnologyService technologyService) {
-        this.name = TechnologyValidator.isExitName(sc,"vui lòng nhập tên công nghệ ",technologyService);
+        this.name = TechnologyValidator.validateTechnologyName(sc,"vui lòng nhập tên công nghệ ",technologyService);
     }
 
     @Override

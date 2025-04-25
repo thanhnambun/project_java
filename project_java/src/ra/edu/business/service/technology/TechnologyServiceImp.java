@@ -28,8 +28,8 @@ public class TechnologyServiceImp implements TechnologyService {
     }
 
     @Override
-    public List<Technology> findAll(int page) {
-        return technologyDao.findAll(page);
+    public List<Technology> findAll(int page,int pageSize) {
+        return technologyDao.findAll(page,pageSize);
     }
 
     @Override
@@ -38,8 +38,13 @@ public class TechnologyServiceImp implements TechnologyService {
     }
 
     @Override
-    public Technology findTechnologyByName(String name) {
+    public List<Technology> findTechnologyByName(String name) {
         return technologyDao.findTechnologyByName(name);
+    }
+
+    @Override
+    public boolean isExistTechnology(String name) {
+        return technologyDao.isExistTechnology(name);
     }
 
     private final TechnologyDao technologyDao;
