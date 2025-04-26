@@ -60,7 +60,7 @@ CREATE TABLE application
     interviewRequestResult TEXT,
     interviewLink          VARCHAR(255),
     interviewTime          DATETIME,
-    interviewResult        enum ('disqualified,passed,cancel'),
+    interviewResult        enum ('disqualified','passed','cancel'),
     interviewResultNote    TEXT,
     destroyAt              DATETIME,
     createAt               DATETIME                                          DEFAULT CURRENT_TIMESTAMP,
@@ -175,7 +175,6 @@ begin
     set offset_technology = (page - 1) * page_size;
     select *
     from technology
-    where status = 'active'
     limit page_size offset offset_technology;
 end;
 
@@ -238,7 +237,7 @@ end;
 create procedure is_exit_name(name_in varchar(100))
 begin
     select count(id) from technology where name = name_in;
-end ;
+end;
 -- cadidate
 -- admin
 create procedure check_isExit_email_candidate(email_in varchar(100))
@@ -253,16 +252,13 @@ CREATE PROCEDURE get_total_candidate_pages()
 BEGIN
     SELECT CEIL(COUNT(*) / 5) AS total_pages FROM candidate;
 END;
-CREATE PROCEDURE find_all_candidate(page INT,page_size int)
+CREATE PROCEDURE find_all_candidate(page INT, page_size int)
 BEGIN
     DECLARE offset_candidate INT;
     SET offset_candidate = (page - 1) * page_size;
 
     SELECT *
     FROM candidate c
-             left join account a on c.id = a.candidate_id
-    where c.status = 'active'
-      and a.role = 'candidate'
     LIMIT page_size OFFSET offset_candidate;
 END;
 
@@ -300,7 +296,23 @@ END;
 create procedure is_exit_phone(phone_in int)
 begin
     select count(id) from candidate where phone = phone_in;
-end //
+end;
+CREATE PROCEDURE block_candidate(
+    IN candidate_id_in INT,
+    IN status_in VARCHAR(10),
+    IN result_in VARCHAR(15),
+    IN destroy DATETIME
+)
+BEGIN
+    UPDATE candidate
+    SET status = status_in
+    WHERE id = candidate_id_in;
+
+    UPDATE application
+    SET interviewResult = result_in,
+        destroyAt       = destroy
+    WHERE candidateId = candidate_id_in;
+END;
 -- recruitment position
 create procedure find_recruitment_position_by_id(id_id int)
 begin
@@ -344,7 +356,7 @@ CREATE PROCEDURE get_total_recruitment_position_pages()
 BEGIN
     SELECT CEIL(COUNT(*) / 5) AS total_pages FROM recruitment_position;
 END;
-CREATE PROCEDURE find_all_recruitment_position(page INT,page_size int)
+CREATE PROCEDURE find_all_recruitment_position(page INT, page_size int)
 BEGIN
     DECLARE offset_recruitment_position INT;
     SET offset_recruitment_position = (page - 1) * page_size;
@@ -378,7 +390,7 @@ CREATE PROCEDURE get_total_application_pages()
 BEGIN
     SELECT CEIL(COUNT(*) / 5) AS total_pages FROM application;
 END;
-CREATE PROCEDURE find_all_application(page INT,page_size int)
+CREATE PROCEDURE find_all_application(page INT, page_size int)
 BEGIN
     DECLARE offset_application INT;
     SET offset_application = (page - 1) * page_size;
@@ -393,8 +405,7 @@ CREATE PROCEDURE filter_application_progress(
 BEGIN
     SELECT *
     FROM application
-    WHERE destroyAt IS NULL
-      AND progress = progress_in;
+    WHERE progress = progress_in;
 
 END;
 CREATE PROCEDURE filter_application_result(
@@ -403,8 +414,7 @@ CREATE PROCEDURE filter_application_result(
 BEGIN
     SELECT *
     FROM application
-    WHERE destroyAt IS NULL
-      AND interviewResult =result_in;
+    WHERE interviewResult = result_in;
 
 END;
 
@@ -486,13 +496,13 @@ begin
       and recruitmentPositionId = position_id_in
       and interviewResult = 'disqualified';
 end;
-create procedure delete_application_candidate(candidate_id int)
-    begin
-        update application
-            set interviewResult ='cancel'
-            and destroyAt = now()
-        where candidateId =candidate_id ;
-    end //
+CREATE PROCEDURE delete_application_candidate(IN application_id INT)
+BEGIN
+    UPDATE application
+    SET interviewResult = 'cancel',
+        destroyAt       = NOW()
+    WHERE id = application_id;
+END;
 -- recruitment_position_technology
 create procedure save_recruitment_position_technology(
     technology_id_in int,
