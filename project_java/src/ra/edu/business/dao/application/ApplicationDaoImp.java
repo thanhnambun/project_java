@@ -130,7 +130,7 @@ public class ApplicationDaoImp implements ApplicationDao {
              connection = ConnectionDB.openConnection();
              callStmt = connection.prepareCall("{call find_application_by_id(?)}");
             callStmt.setInt(1, id);
-            ResultSet rs = callStmt.executeQuery();
+          ResultSet rs = callStmt.executeQuery();
 
             if (rs.next()) {
                 Application app = new Application();
@@ -401,16 +401,16 @@ public class ApplicationDaoImp implements ApplicationDao {
     public boolean cancelApplication(Application application) {
         Connection connection = null;
         CallableStatement callStmt = null;
-        ResultSet rs = null;
-        try{
+        try {
             connection = ConnectionDB.openConnection();
-            callStmt = connection.prepareCall("{call cancel_application(?)}");
-            callStmt.getInt(application.getId());
-            callStmt.getString(application.getDestroyReason());
+            callStmt = connection.prepareCall("{call cancel_application(?,?)}");
+            callStmt.setInt(1, application.getId());
+            callStmt.setString(2, application.getDestroyReason());
+
             callStmt.execute();
             return true;
-        }catch (Exception e) {
-            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             ConnectionDB.closeConnection(connection, callStmt);
         }
@@ -601,13 +601,13 @@ public class ApplicationDaoImp implements ApplicationDao {
     }
 
     @Override
-    public boolean deleteApplication(int candidateID) {
+    public boolean deleteApplication(int appID) {
         Connection  connection = null;
         CallableStatement callStmt = null;
         try {
             connection = ConnectionDB.openConnection();
             callStmt = connection.prepareCall("{call delete_application_candidate(?)}");
-            callStmt.setInt(1, candidateID);
+            callStmt.setInt(1, appID);
             callStmt.execute();
             return true;
         }catch (SQLException e) {
@@ -689,7 +689,7 @@ public class ApplicationDaoImp implements ApplicationDao {
         CallableStatement callStmt = null;
         try{
             connection = ConnectionDB.openConnection();
-            callStmt= connection.prepareCall("{call update_interview_result(?)}");
+            callStmt= connection.prepareCall("{call update_interview_result(?,?,?)}");
             callStmt.setInt(1, application.getId());
             callStmt.setString(2,application.getInterviewResultNote());
             callStmt.setString(3,application.getInterviewResult().name());

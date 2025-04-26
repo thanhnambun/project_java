@@ -96,14 +96,15 @@ public class RecruitmentPositionDaoImp implements RecruitmentPositionDao {
     }
 
     @Override
-    public List<RecruitmentPosition> findAll(int page) {
+    public List<RecruitmentPosition> findAll(int page,int pageSize) {
         List<RecruitmentPosition> recruitmentPositions = new ArrayList<>();
         Connection connectionDB = null;
         CallableStatement call = null;
         try {
             connectionDB = ConnectionDB.openConnection();
-            call = connectionDB.prepareCall("{call find_all_recruitment_position(?)}");
+            call = connectionDB.prepareCall("{call find_all_recruitment_position(?,?)}");
             call.setInt(1, page);
+            call.setInt(2, pageSize);
             ResultSet rs = call.executeQuery();
             while (rs.next()) {
                 RecruitmentPosition recruitmentPosition = new RecruitmentPosition();

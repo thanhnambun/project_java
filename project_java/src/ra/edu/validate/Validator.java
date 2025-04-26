@@ -1,6 +1,7 @@
 package ra.edu.validate;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -38,22 +39,19 @@ public class Validator {
         }
     }
 
-
-    public static double validateDouble(Scanner sc, String message) {
+    public static LocalTime validateTime(String message, Scanner sc) {
         while (true) {
-            System.out.println(message);
             try {
-                String value = sc.nextLine().trim();
-                if (value.isEmpty()) {
-                    System.err.println("không được để trống");
-                    continue;
-                }
-                return Double.parseDouble(value);
+                System.out.print(message + " (định dạng HH:mm): ");
+                String input = sc.nextLine();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                return LocalTime.parse(input, formatter);
             } catch (Exception e) {
-                System.out.println("không đúng định dạng kiểu double");
+                System.out.println("Sai định dạng giờ. Vui lòng nhập lại (ví dụ: 14:30).");
             }
         }
     }
+
 
     private static boolean parseEnumValue(String input, Class<?> type) {
         Class<? extends Enum> enumType = (Class<? extends Enum>) type;

@@ -82,7 +82,7 @@ public class ApplicationServiceImp implements ApplicationService {
     }
 
     @Override
-    public boolean deleteApplication(int candidateID) {
-        return applicationDao.deleteApplication(candidateID);
+    public boolean deleteApplication(int appId) {
+        return applicationDao.deleteApplication(appId);
     }
 }

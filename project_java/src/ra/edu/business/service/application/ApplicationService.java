@@ -19,5 +19,5 @@ public interface ApplicationService {
     List<Application> findApplicationByCandidateId(int id);
     Application viewApplicationDetailCandidate(int appId);
     Application findByCandidateAndPosition(int candidateId, int positionId);
-    boolean deleteApplication(int candidateID);
+    boolean deleteApplication(int appId);
 }

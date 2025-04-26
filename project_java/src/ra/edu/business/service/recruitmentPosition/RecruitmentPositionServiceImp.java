@@ -34,8 +34,8 @@ public class RecruitmentPositionServiceImp implements RecruitmentPositionService
     }
 
     @Override
-    public List<RecruitmentPosition> findAll(int page) {
-        return recruitmentPositionDao.findAll(page);
+    public List<RecruitmentPosition> findAll(int page,int pageSize) {
+        return recruitmentPositionDao.findAll(page,pageSize);
     }
 
     @Override

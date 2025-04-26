@@ -12,8 +12,8 @@ public class PasswordGenerator {
     private static final SecureRandom random = new SecureRandom();
 
     public static String generateRandomPassword(int length) {
-        if (length < 6) {
-            throw new IllegalArgumentException("Độ dài mật khẩu nên >= 6");
+        if (length < 8) {
+            throw new IllegalArgumentException("Độ dài mật khẩu phải >= 8 ký tự");
         }
 
         StringBuilder password = new StringBuilder(length);
@@ -29,6 +29,7 @@ public class PasswordGenerator {
 
         return shuffleString(password.toString());
     }
+
     private static String shuffleString(String input) {
         char[] chars = input.toCharArray();
         for (int i = 0; i < chars.length; i++) {
@@ -40,4 +41,3 @@ public class PasswordGenerator {
         return new String(chars);
     }
 }
-

@@ -8,6 +8,7 @@ import ra.edu.business.model.candidate.CandidateGender;
 import ra.edu.business.model.candidate.CandidateStatus;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class CandidateDaoImp implements CandidateDao {
 
         try {
             connection = ConnectionDB.openConnection();
-            callStmt = connection.prepareCall("{call find_all_candidate(?)}");
+            callStmt = connection.prepareCall("{call find_all_candidate(?,?)}");
             callStmt.setInt(1, page);
             callStmt.setInt(2, pageSize);
             rs = callStmt.executeQuery();
@@ -370,6 +371,42 @@ public class CandidateDaoImp implements CandidateDao {
 
         return exists;
     }
+
+    @Override
+    public boolean blockCandidate(Candidate candidate, String result, LocalDateTime date) {
+        Connection connection = null;
+        CallableStatement callStmt = null;
+        boolean isSuccess = false;
+
+        try {
+            connection = ConnectionDB.openConnection();
+            callStmt = connection.prepareCall("{call block_candidate(?,?,?,?)}");
+            callStmt.setInt(1, candidate.getId());
+            callStmt.setString(2, candidate.getStatus().name());
+
+            if (result != null) {
+                callStmt.setString(3, result);
+            } else {
+                callStmt.setNull(3, Types.VARCHAR);
+            }
+
+            if (date != null) {
+                callStmt.setTimestamp(4, Timestamp.valueOf(date));
+            } else {
+                callStmt.setNull(4, Types.TIMESTAMP);
+            }
+
+            callStmt.executeUpdate();
+            isSuccess = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(connection, callStmt);
+        }
+        return isSuccess;
+    }
+
 
     @Override
     public boolean changePassword(Account account) {

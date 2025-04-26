@@ -6,6 +6,7 @@ import ra.edu.business.model.account.Account;
 import ra.edu.business.model.candidate.Candidate;
 import ra.edu.business.model.candidate.CandidateStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class CandidateServiceImp implements CandidateService {
@@ -84,5 +85,10 @@ public class CandidateServiceImp implements CandidateService {
     @Override
     public boolean isPhoneExist(String phone) {
         return cadidateDao.isPhoneExist(phone);
+    }
+
+    @Override
+    public boolean blockCandidate(Candidate candidate, String result, LocalDateTime date) {
+        return cadidateDao.blockCandidate(candidate, result, date);
     }
 }

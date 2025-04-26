@@ -4,6 +4,7 @@ import ra.edu.business.model.account.Account;
 import ra.edu.business.model.candidate.Candidate;
 import ra.edu.business.model.candidate.CandidateStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CandidateDao {
@@ -21,4 +22,5 @@ public interface CandidateDao {
     int getTotalPages();
     boolean isEmailExist(String email);
     boolean isPhoneExist(String phone);
+    boolean blockCandidate(Candidate candidate, String result, LocalDateTime date);
 }

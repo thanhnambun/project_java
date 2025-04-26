@@ -208,7 +208,7 @@ public class TechnologyDaoImp implements TechnologyDao {
 
         try {
             connection = ConnectionDB.openConnection();
-            callStmt = connection.prepareCall("{call is_exist_technology(?)}");
+            callStmt = connection.prepareCall("{call is_exit_name(?)}");
             callStmt.setString(1, name);
             rs = callStmt.executeQuery();
 

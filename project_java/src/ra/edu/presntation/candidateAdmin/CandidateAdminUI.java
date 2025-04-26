@@ -14,6 +14,7 @@ import ra.edu.business.service.technology.TechnologyService;
 import ra.edu.business.service.technology.TechnologyServiceImp;
 import ra.edu.presntation.CandidateUI;
 import ra.edu.presntation.TechnologyUI;
+import ra.edu.utils.ConsoleColor;
 import ra.edu.validate.CandidateValidator;
 import ra.edu.validate.StringRule;
 import ra.edu.validate.Validator;
@@ -26,8 +27,10 @@ public class CandidateAdminUI {
     public static void Menu(Scanner sc) {
         CandidateService candidateService = new CandidateServiceImp();
         TechnologyService technologyService = new TechnologyServiceImp();
+        ApplicationService applicationService = new ApplicationServiceImp();
+
         while (true) {
-            System.out.println("\n=== QUẢN LÝ ỨNG VIÊN ===");
+            System.out.println(ConsoleColor.BLUE + "\n=== QUẢN LÝ ỨNG VIÊN ===" + ConsoleColor.RESET);
             System.out.println("1. Xem danh sách ứng viên");
             System.out.println("2. Khóa / mở khóa tài khoản");
             System.out.println("3. Reset mật khẩu");
@@ -38,12 +41,13 @@ public class CandidateAdminUI {
             System.out.println("8. Lọc theo công nghệ");
             System.out.println("9. Quay lại");
             System.out.print("Chọn: ");
+
             switch (sc.nextLine()) {
                 case "1":
                     findCandidate(sc, candidateService);
                     break;
                 case "2":
-                    blockAccount(sc, candidateService);
+                    blockAccount(sc, candidateService, applicationService);
                     break;
                 case "3":
                     resetPassword(sc, candidateService);
@@ -61,29 +65,30 @@ public class CandidateAdminUI {
                     finCandidateByGender(sc, candidateService);
                     break;
                 case "8":
-                    finCandidateByTechnology(sc,candidateService,technologyService);
+                    finCandidateByTechnology(sc, candidateService, technologyService);
                     break;
                 case "9":
                     return;
                 default:
-                    System.out.println("Chọn sai, nhập lại!");
+                    System.out.println(ConsoleColor.RED + "Chọn sai, nhập lại!" + ConsoleColor.RESET);
             }
         }
     }
 
+
     public static void findCandidate(Scanner sc, CandidateService candidateService) {
         int totalPages = candidateService.getTotalPages();
         int currentPage = 1;
-        int pageSize = Validator.validateInt(sc,"vui long nhập số lượng ứng viên trên 1 trang");
+        int pageSize = Validator.validateInt(sc, "vui lòng nhập số lượng ứng viên trên 1 trang");
 
         while (true) {
-            System.out.println("\n--- Danh sách phòng ban - Trang " + currentPage + "/" + totalPages + " ---");
+            System.out.println(ConsoleColor.BLUE + "\n--- Danh sách ứng viên - Trang " + currentPage + "/" + totalPages + " ---" + ConsoleColor.RESET);
 
-            List<Candidate> candidateslist = candidateService.findAll(currentPage,pageSize);
+            List<Candidate> candidateslist = candidateService.findAll(currentPage, pageSize);
             if (candidateslist.isEmpty()) {
-                System.out.println("Không có phòng ban nào trong trang này.");
+                System.out.println(ConsoleColor.RED + "Không có ứng viên nào trong trang này." + ConsoleColor.RESET);
             } else {
-                System.out.printf("%-5s | %-20s | %-25s | %-15s | %-10s%n",
+                System.out.printf(ConsoleColor.BLUE + "%-5s | %-20s | %-25s | %-15s | %-10s%n" + ConsoleColor.RESET,
                         "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm");
                 System.out.println("-------------------------------------------------------------------------------");
 
@@ -95,8 +100,8 @@ public class CandidateAdminUI {
                             candidate.getPhone(),
                             candidate.getExperience());
                 }
-
             }
+
             System.out.println("\nChọn hành động:");
             System.out.println("1. Trang trước");
             System.out.println("2. Trang sau");
@@ -109,58 +114,74 @@ public class CandidateAdminUI {
                     if (currentPage > 1) {
                         currentPage--;
                     } else {
-                        System.out.println("Đang ở trang đầu tiên.");
+                        System.out.println(ConsoleColor.RED + "Đang ở trang đầu tiên." + ConsoleColor.RESET);
                     }
                     break;
                 case "2":
                     if (currentPage < totalPages) {
                         currentPage++;
                     } else {
-                        System.out.println("Đang ở trang cuối cùng.");
+                        System.out.println(ConsoleColor.RED + "Đang ở trang cuối cùng." + ConsoleColor.RESET);
                     }
                     break;
                 case "0":
                     return;
                 default:
-                    System.out.println("Lựa chọn không hợp lệ.");
+                    System.out.println(ConsoleColor.RED + "Lựa chọn không hợp lệ." + ConsoleColor.RESET);
                     break;
             }
         }
     }
+
 
     public static Candidate finCandidateById(Scanner sc, CandidateService candidateService) {
-        int id = Validator.validateInt(sc, "vui lòng nhập id của ứng viên ");
-        return candidateService.findById(id);
+        Candidate candidate = null;
+        do {
+            int id = Validator.validateInt(sc, "Vui lòng nhập ID của ứng viên: ");
+            candidate = candidateService.findById(id);
+            if (candidate == null) {
+                System.out.println(ConsoleColor.RED + "Không tìm thấy ứng viên với ID: " + id + ", vui lòng thử lại!" + ConsoleColor.RESET);
+            }
+        } while (candidate == null);
+        return candidate;
     }
 
-    public static void blockAccount(Scanner sc, CandidateService candidateService) {
-        ApplicationService applicationService = new ApplicationServiceImp();
+    public static void blockAccount(Scanner sc, CandidateService candidateService, ApplicationService applicationService) {
         Candidate candidate = finCandidateById(sc, candidateService);
-        while (true) {
-            System.out.println("1. block tài khoản ");
-            System.out.println("2. mở block tài khoản ");
-            System.out.println("3. thoát");
-            int choice = Validator.validateInt(sc, "vui lòng chọn ");
-            switch (choice) {
-                case 1:
-                    candidate.setStatus(CandidateStatus.block);
-                    List<Application> applicationList = applicationService.findApplicationByCandidateId(candidate.getId());
-                    for (Application application : applicationList) {
-                        application.setInterviewResult(Result.disqualified);
-                        application.setDestroyAt(LocalDateTime.now());
-                    }
-                    break;
-                case 2:
-                    candidate.setStatus(CandidateStatus.active);
-                    break;
-                case 3:
-                    candidateService.updateProfile(candidate);
-                    return;
-                default:
-                    System.out.println("vui lòng nhập từ 1 đến 3 ");
-                    break;
-            }
+        System.out.println(ConsoleColor.YELLOW + "Vui lòng lựa chọn" + ConsoleColor.RESET);
+        System.out.println("1. Block tài khoản");
+        System.out.println("2. Mở block tài khoản");
+        System.out.println("3. Thoát");
+
+        int choice = Validator.validateInt(sc, "Vui lòng chọn: ");
+        switch (choice) {
+            case 1:
+                candidate.setStatus(CandidateStatus.block);
+                candidateService.blockCandidate(candidate, Result.disqualified.name(), LocalDateTime.now());
+                System.out.println(ConsoleColor.RED + ">> Đã khóa tài khoản!" + ConsoleColor.RESET);
+                break;
+            case 2:
+                candidate.setStatus(CandidateStatus.active);
+                candidateService.blockCandidate(candidate, null, null);
+                System.out.println(ConsoleColor.GREEN + ">> Đã mở khóa tài khoản!" + ConsoleColor.RESET);
+                break;
+            case 3:
+                candidateService.updateProfile(candidate);
+                return;
+            default:
+                System.out.println(ConsoleColor.RED + "Vui lòng nhập từ 1 đến 3!" + ConsoleColor.RESET);
+                return;
         }
+
+        System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
+                candidate.getId(),
+                candidate.getName(),
+                candidate.getEmail(),
+                candidate.getPhone(),
+                candidate.getExperience());
     }
 
     public static void resetPassword(Scanner sc, CandidateService candidateService) {
@@ -169,20 +190,24 @@ public class CandidateAdminUI {
         String new_password = PasswordGenerator.generateRandomPassword(10);
         account.setPassword(new_password);
         candidateService.changePassword(account);
-        System.out.println("đã reset thành công mật khẩu với giá trị " + account.getPassword());
+        System.out.println(ConsoleColor.GREEN + ">> Đã reset thành công mật khẩu với giá trị: "
+                + ConsoleColor.YELLOW + account.getPassword() + ConsoleColor.RESET);
     }
 
     public static void finCandidateByName(Scanner sc, CandidateService candidateService) {
-        String name = Validator.validateString(sc, "vui lòng nhập tên ứng viên cần tìm kiếm ", new StringRule(100, 0));
-        List<Candidate> candidate = candidateService.searchByName(name);
-        if (candidate.isEmpty()) {
-            System.err.println("không ti thấy tên ứng viên như trên");
+        String name = Validator.validateString(sc, "Vui lòng nhập tên ứng viên cần tìm kiếm: ", new StringRule(100, 0));
+        List<Candidate> candidates = candidateService.searchByName(name);
+        if (candidates.isEmpty()) {
+            System.out.println(ConsoleColor.RED + "Không tìm thấy tên ứng viên như trên." + ConsoleColor.RESET);
+            return;
         }
-        for (Candidate c : candidate) {
-            System.out.printf("%-5s | %-20s | %-25s | %-15s | %-10s%n",
-                    "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm");
-            System.out.println("-------------------------------------------------------------------------------");
-            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10.1f%n",
+
+        System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
+        System.out.println("-------------------------------------------------------------------------------");
+
+        for (Candidate c : candidates) {
+            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
                     c.getId(),
                     c.getName(),
                     c.getEmail(),
@@ -191,17 +216,19 @@ public class CandidateAdminUI {
         }
     }
 
+
     public static void finCandidateByExperience(Scanner sc, CandidateService candidateService) {
         int experience = Validator.validateInt(sc, "vui lòng nhập số năm kinh nghiệm");
         List<Candidate> candidateList = candidateService.filterByExperience(experience);
         if (candidateList.isEmpty()) {
-            System.err.println("không tìm thấy ứng viên có số năm kinh nghiệm như trên");
+            System.out.println(ConsoleColor.RED + "Không tìm thấy ứng viên có số năm kinh nghiệm như trên." + ConsoleColor.RESET);
+            return;
         }
+        System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
         for (Candidate c : candidateList) {
-            System.out.printf("%-5s | %-20s | %-25s | %-15s | %-10s%n",
-                    "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm");
             System.out.println("-------------------------------------------------------------------------------");
-            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10.1f%n",
+            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
                     c.getId(),
                     c.getName(),
                     c.getEmail(),
@@ -215,13 +242,14 @@ public class CandidateAdminUI {
         int maxAge = Validator.validateInt(sc, "vui lòng nhập tuổi");
         List<Candidate> candidateList = candidateService.filterByAge(minAge, maxAge);
         if (candidateList.isEmpty()) {
-            System.err.println("không tìm thấy ứng viên có số tuổi như trên");
+            System.out.println(ConsoleColor.RED + "Không tìm thấy ứng viên có số độ tuổi như trên." + ConsoleColor.RESET);
+            return;
         }
+        System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
         for (Candidate c : candidateList) {
-            System.out.printf("%-5s | %-20s | %-25s | %-15s | %-10s%n",
-                    "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm");
             System.out.println("-------------------------------------------------------------------------------");
-            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10.1f%n",
+            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
                     c.getId(),
                     c.getName(),
                     c.getEmail(),
@@ -256,32 +284,36 @@ public class CandidateAdminUI {
         }
         List<Candidate> candidateList = candidateService.filterByGender(candidateGender);
         if (candidateList.isEmpty()) {
-            System.out.println("Không tìm thấy ứng viên với giới tính: " + candidateGender);
+            System.out.println(ConsoleColor.RED + "Không tìm thấy ứng viên với giới tính: " + candidateGender + ConsoleColor.RESET);
         } else {
-            System.out.printf("%-5s | %-20s | %-10s | %-20s%n", "ID", "Tên", "Giới tính", "Email");
-            System.out.println("-------------------------------------------------------------");
+            System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                    "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
+
             for (Candidate candidate : candidateList) {
-                System.out.printf("%-5d | %-20s | %-10s | %-20s%n",
+                System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
                         candidate.getId(),
                         candidate.getName(),
-                        candidate.getGender(),
-                        candidate.getEmail());
+                        candidate.getEmail(),
+                        candidate.getPhone(),
+                        candidate.getExperience());
             }
         }
     }
 
     public static void finCandidateByTechnology(Scanner sc, CandidateService candidateService, TechnologyService technologyService) {
-        TechnologyUI.findTechnology(sc,technologyService);
-        int tech_id = Validator.validateInt(sc,"vui lòng nhập id của công nghệ");
+        TechnologyUI.findTechnology(sc, technologyService);
+        int tech_id = Validator.validateInt(sc, "vui lòng nhập id của công nghệ");
         List<Candidate> candidateList = candidateService.filterByTechnology(tech_id);
         if (candidateList.isEmpty()) {
             System.err.println("không tìm thấy ứng viên có sử dụng công nghệ như trên");
+            return;
         }
+        System.out.println(ConsoleColor.YELLOW + String.format("%-5s | %-20s | %-25s | %-15s | %-10s",
+                "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm") + ConsoleColor.RESET);
+
         for (Candidate c : candidateList) {
-            System.out.printf("%-5s | %-20s | %-25s | %-15s | %-10s%n",
-                    "ID", "Tên Sinh Viên", "Email", "Phone", "Kinh Nghiệm");
             System.out.println("-------------------------------------------------------------------------------");
-            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10.1f%n",
+            System.out.printf("%-5d | %-20s | %-25s | %-15s | %-10d%n",
                     c.getId(),
                     c.getName(),
                     c.getEmail(),

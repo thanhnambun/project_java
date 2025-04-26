@@ -11,6 +11,6 @@ public interface RecruitmentPositionDao {
     boolean saveRecruitmentPosition( RecruitmentPosition recruitmentPosition);
     boolean deleteRecruitmentPosition(RecruitmentPosition recruitmentPosition);
     boolean updateRecruitmentPosition(RecruitmentPosition recruitmentPosition);
-    List<RecruitmentPosition> findAll(int page);
+    List<RecruitmentPosition> findAll(int page,int pageSize);
     RecruitmentPosition findRecruitmentPositionById(int id);
 }
